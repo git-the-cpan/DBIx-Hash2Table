@@ -1,5 +1,12 @@
 Revision history for Perl extension DBIx::Hash2Table.
 
+1.03  Sun Mar 23 11:29:00 2003
+	- No source code changes in this version
+	- Patch to stop shipping blib/ directory in Unix distros, because the
+		PAUSE indexer takes this directory to indicate a binary distro,
+		which means it does not index the module, and this in turn means
+		the module is not listed in the CPAN daily update list, etc.
+
 1.02  Sun Jan 26 10:43:00 2003
 	- Fix bug for where user specifies more than 1 'extra' column in the 'columns' parameter
 	- Add extra columns to the table created by examples/test-hash2table.pl, in
