@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: DBIx-Hash2Table
+version: 2.00
+author:
+  - Ron Savage <ron@savage.net.au>
+abstract: Save a hash into a database table
+license: artistic
+requires:
+  Carp: 0
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+provides: {}
+generated_by: Module::Build version 0.24

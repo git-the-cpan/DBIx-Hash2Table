@@ -7,7 +7,7 @@
 #	Test DBIx::Hash2Table.
 #
 # Note:
-#	Lines 78 .. 81 allow you to control the output.
+#	Lines 84 .. 86 allow you to control the output.
 #
 # Author:
 #	Ron Savage <ron@savage.net.au>
@@ -18,7 +18,7 @@ use warnings;
 
 use Data::Dumper;
 use DBI;
-use DBIx::Hash2Table;
+use DBIx::Hash2Table 2.00;
 use Error qw/ :try /;
 
 # -----------------------------------------------
@@ -80,10 +80,10 @@ sub test
 		hash_ref   => \%hobbit,
 		dbh        => $dbh,
 		table_name => $table_name,
-#		columns    => ['id', 'parent_id', 'name']								# Ignore codes etc.
-#		columns    => ['id', 'parent_id', 'name', 'code']						# Write codes to table.
-#		columns    => ['id', 'parent_id', 'name', '_run_mode', 'code']			# Write codes, run modes to table.
-		columns    => ['id', 'parent_id', 'name', '_run_mode', '_url', 'code']	# Write everything to table.
+		columns    => ['id', 'parent_id', 'name'],
+#		extras     => ['code']
+#		extras     => ['code', '_run_mode']
+#		extras     => ['_url', 'code', '_run_mode']
 	) -> insert();
 
 	my($data) = $dbh -> selectall_hashref("select * from $table_name", 'id');
@@ -105,7 +105,7 @@ try
 {
 	my($dbh) = DBI -> connect
 	(
-		'DBI:mysql:test:127.0.0.1', 'route', 'bier',
+		'DBI:mysql:test:127.0.0.1', 'root', 'toor',
 		{
 			AutoCommit			=> 1,
 			HandleError			=> sub {Error::Simple -> record($_[0]); 0},

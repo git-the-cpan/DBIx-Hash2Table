@@ -55,7 +55,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 
 );
-our $VERSION = '1.03';
+our $VERSION = '2.00';
 
 # -----------------------------------------------
 
@@ -70,6 +70,7 @@ our $VERSION = '1.03';
 	(
 		_columns	=> '',
 		_dbh		=> '',
+		_extras		=> [],
 		_hash_ref	=> '',
 		_table_name	=> '',
 	);
@@ -85,7 +86,7 @@ our $VERSION = '1.03';
 	{
 		my($self, $sth, $hash_ref, $parent) = @_;
 
-		my(@bind, @sub_key);
+		my(@bind);
 
 		for my $key (keys %$hash_ref)
 		{
@@ -97,17 +98,7 @@ our $VERSION = '1.03';
 
 				@bind = ($$self{'_id'}, $parent, $key);
 
-				# Then, get it's keys...
-
-				@sub_key = keys %{$$hash_ref{$key} };
-
-				# And see if the caller wants any of them written to the db.
-				# Warning: The caller must set up columns => [...] correctly.
-				# That is, the column order must match the SQL insert statement below.
-				# We can't sort columns => [...] because then we would lose the fact
-				# that the first 3 column names are special.
-
-				for (sort keys %{$$self{'_sub_keys'} })
+				for (@{$$self{'_extras'} })
 				{
 					push(@bind, exists($$hash_ref{$key}{$_}) ? $$hash_ref{$key}{$_} : undef);
 				}
@@ -132,21 +123,11 @@ our $VERSION = '1.03';
 
 sub insert
 {
-	my($self)		= @_;
-	my($sql)		= "insert into $$self{'_table_name'} (" . join(', ', @{$$self{'_columns'} }) . ') values (' . join(', ', ('?') x @{$$self{'_columns'} }) . ')';
-	my($sth)		= $$self{'_dbh'} -> prepare($sql);
-	$$self{'_id'}	= 0;
-	my(@other_keys)	= @{$$self{'_columns'} };
-
-	shift @other_keys; # Discard id.
-	shift @other_keys; # Discard parent_id.
-	shift @other_keys; # Discard name.
-
-	# Convert array other_keys into hash ref _sub_keys
-	# so sub _save can easily look up any keys it comes across.
-
-	$$self{'_sub_keys'}						= {};
-	@{$$self{'_sub_keys'} }{@other_keys}	= (1) x @other_keys;
+	my($self)			= @_;
+	$$self{'_extras'}	= [sort @{$$self{'_extras'} }];
+	my($sql)			= "insert into $$self{'_table_name'} (" . join(', ', @{$$self{'_columns'} }, @{$$self{'_extras'} }) . ') values (' . join(', ', ('?') x ($#{$$self{'_columns'} } + $#{$$self{'_extras'} } + 2) ) . ')';
+	my($sth)			= $$self{'_dbh'} -> prepare($sql);
+	$$self{'_id'}		= 0;
 
 	$self -> _save($sth, $$self{'_hash_ref'}, 0);
 
@@ -179,7 +160,7 @@ sub new
 		}
 	}
 
-	croak(__PACKAGE__ . '. You must supply a value for each parameter')
+	croak(__PACKAGE__ . ". You must supply a value for each parameter except 'extras'")
 		if (! ($$self{'_columns'} && $$self{'_dbh'} && $$self{'_hash_ref'} && $$self{'_table_name'}) );
 
 	return $self;
@@ -211,7 +192,7 @@ C<DBIx::Hash2Table> - Save a hash into a database table
 	eval{$dbh -> do("drop table $table_name")};
 
 	my($sql) = "create table $table_name (id int, parent_id int, " .
-				"code char(5), name varchar(255) )";
+				"code char(5), name varchar(255), _url varchar(255) )";
 
 	$dbh -> do($sql);
 
@@ -220,41 +201,55 @@ C<DBIx::Hash2Table> - Save a hash into a database table
 		hash_ref   => \%entity,
 		dbh        => $dbh,
 		table_name => $table_name,
-#		columns    => ['id', 'parent_id', 'name'] # or
-#		columns    => ['id', 'parent_id', 'name', 'code']
-		columns    => ['id', 'parent_id', 'name', '_url', 'code']
+		columns    => ['id', 'parent_id', 'name'],
+#		extras     => ['code']
+#		extras     => ['_url', 'code']
+#		extras     => ['code', '_url']
 	) -> insert();
 
 =head1 Description
 
 C<DBIx::Hash2Table> is a pure Perl module.
 
-This module saves a hash into an existing database table of at least 3 columns.
+This module saves a hash ref into an existing database table of at least 3 columns.
 
-I suggest you display the script examples/test-hash2table.pl in another window while reading the following.
+Each row in the table will consist of these 3 columns, at least: id (row number),
+parent's id, and the value of a hash key.
 
-In fact, you are I<strongly> recommended to run the demo now, and examine the resultant database table, before reading
-further. Then, move the comment # up from line 72 to 71 and run it again.
+You specify the names of these 3 columns in the constructor's array ref parameter
+called C<columns>.
 
-Hash keys normally point to hash refs. This nested structure is preserved when the data is written to the table.
+I suggest you display the script examples/test-hash2table.pl in another window while
+reading the following.
 
-That is, when a hash key points to a hash ref, the hash key is written to the table. The module keeps track of the
-row in the table containing the parent of the 'current' hash key, and the parent's id (row number) is written to the
-'current' row of the table.
+In fact, you are I<strongly> recommended to run the demo now, and examine the resultant
+database table, before reading further. Then, remove the comment '#' from one of lines
+84 .. 86 and run it again.
 
-Inside the hash ref you can have hash keys which are column names, or you can have hash keys which are 'normal'
-hash keys.
+In the hash ref being saved to the database, hash keys normally point to hash refs.
+This nested structure is preserved when the data is written to the table.
 
-If the nested hash key is a column name, then it should point to a non-ref, ie a number or a string. In that case,
-you can optionally have the value it points to written to the table. In the example code, such a nested hash key is
-called code, and at lines 71 .. 72 you can control whether or not the code values are written to the table.
+That is, the hash keys which point to hash refs become parents in the database,
+and keys within the hash ref being pointed to may become children of this parent.
 
-If the nested hash key is not a column name, then it should point to a hash ref, and when its turn comes, it too
-will be written to the table.
+I say 'may' because inside the hash ref you can have hash keys which are column names,
+and you can have hash keys which are just 'normal' hash keys, ie not column names.
 
-So, each row in the table will consist of these 3 columns, at least: id (row number), parent's id, and hash key.
+If the nested hash key is a column name, then it should point to a non-ref, ie a number
+or a string. In that case, you can optionally have the value it points to written to the
+table.
 
-In more detail, the 3 columns are:
+You activate this feature by putting the names of the columns you wish to have saved in
+the database into the constructor's array ref parameter called C<extras>.
+
+In the example code, such a nested hash keys are called code, _run_mode and _url, and at
+lines 84 .. 86 you can control whether or not any or all of these values are written to
+the table.
+
+If the nested hash key is not a column name, then it should point to a hash ref, and when
+its turn comes, it too will be written to the table.
+
+In more detail, the 3 mandatory columns in each row of the database are:
 
 =over 4
 
@@ -262,9 +257,10 @@ In more detail, the 3 columns are:
 
 An id column
 
-This column is for the unique id of the row containing the hash key.
+This column is for the (unique) id of the row containing the hash key.
 
-You do not have to define this column of the table to be unique, or to be a database key, but that might be a Good Idea.
+You do not have to define this column of the table to be unique, or to be a database key,
+but that might be a Good Idea.
 
 C<DBIx::Hash2Table> counts an integer up from 1, to generate the values for this column.
 
@@ -272,13 +268,15 @@ C<DBIx::Hash2Table> counts an integer up from 1, to generate the values for this
 
 The parent's id column
 
-This column is for the non-unique id of the row of the parent of the hash key.
+This column is for the id of the row of the parent of the hash key.
+
+The root key(s) of the hash will have a parent id of 0.
 
 =item *
 
 A name column
 
-This column is for the hash key itself.
+This column is for the value of the hash key itself.
 
 =back
 
@@ -306,13 +304,17 @@ Parameters:
 
 hash_ref
 
-A reference to the hash to be inserted in the table.
+A reference to the hash to be inserted in a database table.
+
+This parameter is mandatory.
 
 =item *
 
 dbh
 
-This is a database handle.
+A database handle.
+
+This parameter is mandatory.
 
 =item *
 
@@ -320,14 +322,17 @@ table_name
 
 This is the name of the table to populate.
 
+This parameter is mandatory.
+
 =item *
 
 columns
 
-This is an array ref of column names.
+This is an array ref of the 3 mandatory column names.
 
-Warning: The order of entries in this array ref is of great significance. Of course, just because the column
-names must be in this order does not mean the table itself must be declared with the columns in the same order.
+Warning: The order of entries in this array ref is of great significance. Of course, just
+because the column names must be in this order does not mean the table itself must be
+declared with the columns in the same order.
 
 =over 4
 
@@ -336,6 +341,8 @@ names must be in this order does not mean the table itself must be declared with
 Index 0
 
 This is the column name used for the id column.
+
+Ids start at 1.
 
 =item *
 
@@ -351,25 +358,23 @@ Index 2
 
 This is the column name used for the hash key itself.
 
+=back
+
+This parameter is mandatory.
+
 =item *
 
-Indexes 3 .. N (optional)
+extras
 
-Any other column names must be hash keys which satisfy these conditions:
+This is an array ref of column names which are also keys in the hash ref.
+
+It defaults to [].
+
+This parameter is optional.
+
+These column names which are hash keys have the following properties:
 
 =over 4
-
-=item *
-
-The column names 3 .. N are sorted alphabetically
-
-See below.
-
-=item *
-
-It's a column name
-
-The hash key is actually the name of a column in the table.
 
 =item *
 
@@ -379,9 +384,9 @@ The hash key is a child of the 'current' hash key.
 
 =item *
 
-It's value is a constant
+It's value is not a reference
 
-It's value is a non-ref, ie a number or a string.
+The value pointed to be this hash key is a non-ref, ie it's just a number or a string.
 
 =item *
 
@@ -389,17 +394,13 @@ Save me!
 
 You want the hash key's value to be written to the 'current' row of the table.
 
-In other words, even though this hash key (which is a column name!) is a child of the 'current' hash key, the
-value pointed to by this hash key is written to the same row has the 'current' hash key.
+In other words, even though this hash key (which is a column name!) is a child of the
+'current' hash key, the value pointed to by this hash key is written to the same row
+has the 'current' hash key.
 
 =back
 
 The program examples/test-hash2table.pl shows exactly what this means.
-
-Warning: The names of these columns 3 .. N must be sorted alphabetically. That's the only way the module can know how
-to bind the values associated with these columns into their correct places in the SQL insert statement.
-
-=back
 
 =back
 
@@ -413,7 +414,8 @@ See above, in the section called 'Constructor and initialization'.
 
 Returns nothing.
 
-Calling insert() actually executes the SQL insert statement, and recursively writes all hash keys to the table.
+Calling insert() actually executes the SQL insert statement, and recursively writes
+all hash keys to the table.
 
 =head1 Required Modules
 

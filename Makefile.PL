@@ -7,20 +7,26 @@ WriteMakefile
 (
 	($] ge '5.005') ?
 	(
-		'AUTHOR' => 'Ron Savage (ron@savage.net.au)',
-		'ABSTRACT' => 'Save a hash into a database table',
+		'AUTHOR'	=> 'Ron Savage (ron@savage.net.au)',
+		'ABSTRACT'	=> 'Save a hash into a database table',
     ) : (),
-	clean				=>
+	clean			=>
 	{
-		FILES			=> 'blib/* Makefile MANIFEST DBIx-Hash2Table-*'
+		FILES		=> 'blib/* Makefile MANIFEST DBIx-Hash2Table-*'
 	},
-	dist				=>
+	dist			=>
 	{
-		COMPRESS		=> 'gzip',
-		SUFFIX			=> 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
-	DISTNAME			=> 'DBIx-Hash2Table',
-	NAME				=> 'DBIx::Hash2Table',
-	PREREQ_PM			=> {},
-	VERSION_FROM		=> 'Hash2Table.pm',
+	DISTNAME		=> 'DBIx-Hash2Table',
+	NAME			=> 'DBIx::Hash2Table',
+	PL_FILES		=> {},
+	PREREQ_PM		=>
+	{
+		Carp		=> 0,
+		Test::More	=> 0,
+		Test::Pod	=> 0,
+	},
+	VERSION_FROM	=> 'lib/DBIx/Hash2Table.pm',
 );

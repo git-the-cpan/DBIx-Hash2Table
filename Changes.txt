@@ -1,5 +1,22 @@
 Revision history for Perl extension DBIx::Hash2Table.
 
+2.00  Mon Jul 19 14:43:00 2004
+	- Change the API, so that the constructor's parameter 'columns' no longer does
+		double duty. Now, instead of a single parameter 'columns', you use 2 parameters:
+		'columns' and 'extras'. The new parameter 'columns' takes exactly the same 3
+		values as did the old parameter of the same name, and any other values, which you
+		previously had to put in sorted order at the end of the old parameter 'columns',
+		can now be placed in any unsorted order in the new parameter 'extras'. The API
+		should have always been like this - the previous design was very confusing.
+		Since no new functionality has been introduced in V 2.00, there is no need to
+		upgrade, unless compatibility with Module::Build is important (see next point)
+	- Change Makefile.PL to coexist with Module::Build
+	- Rewrite the docs to help clarify the structure of the hash ref which is saved to
+		the database
+	- Patch examples/test-hashref2table.pl to match the new API
+	- Delete ./test.pl
+	- Add t/pod.t to test all PODs
+
 1.03  Sun Mar 23 11:29:00 2003
 	- No source code changes in this version
 	- Patch to stop shipping blib/ directory in Unix distros, because the
