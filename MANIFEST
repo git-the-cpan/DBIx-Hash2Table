@@ -1,0 +1,10 @@
+Hash2Table.pm
+Hash2Table.html
+MANIFEST
+README
+test.pl
+Makefile.PL
+Changes.txt
+examples/hash2table.pl
+t/test.t
+blib/html/site/lib/DBIx/Hash2Table.html
