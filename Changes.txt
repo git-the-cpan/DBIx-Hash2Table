@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx::Hash2Table.
 
+1.01  Sat Jan 18 12:47:00 2003
+	- Change use CGI to use Carp. Upgrading is advised
+
 1.00  Wed Jan  8 12:37:29 2003
 	- original version; created by h2xs 1.20 with options
 		-A -X -f -n DBIx::Hash2Table -v 1.00

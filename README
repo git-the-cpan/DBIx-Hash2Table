@@ -1,10 +1,6 @@
 NAME
     "DBIx::Hash2Table" - Save a hash into a database table
 
-Version
-    This document refers to version 1.00 of "DBIx::Hash2Table", released
-    8-Jan-2003.
-
 Synopsis
             #!/usr/bin/perl
 
