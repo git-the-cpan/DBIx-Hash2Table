@@ -1,5 +1,12 @@
 Revision history for Perl extension DBIx::Hash2Table.
 
+1.02  Sun Jan 26 10:43:00 2003
+	- Fix bug for where user specifies more than 1 'extra' column in the 'columns' parameter
+	- Add extra columns to the table created by examples/test-hash2table.pl, in
+		preparation for using the same table with the demo for DBIx::Table2Hash
+	- Extend test-hash2table.pl to read back in and print the table created
+	- Update docs
+
 1.01  Sat Jan 18 12:47:00 2003
 	- Change use CGI to use Carp. Upgrading is advised
 

@@ -55,7 +55,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 
 );
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # -----------------------------------------------
 
@@ -107,12 +107,10 @@ our $VERSION = '1.01';
 				# We can't sort columns => [...] because then we would lose the fact
 				# that the first 3 column names are special.
 
-				for (sort @sub_key)
+				for (sort keys %{$$self{'_sub_keys'} })
 				{
-					push(@bind, $$hash_ref{$key}{$_}) if ($$self{'_sub_keys'}{$_});
+					push(@bind, exists($$hash_ref{$key}{$_}) ? $$hash_ref{$key}{$_} : undef);
 				}
-
-				push(@bind, undef) while (@bind < @{$$self{'_columns'} });
 
 				$sth -> execute(@bind);
 
@@ -141,8 +139,8 @@ sub insert
 	my(@other_keys)	= @{$$self{'_columns'} };
 
 	shift @other_keys; # Discard id.
-	shift @other_keys; # Discard name.
 	shift @other_keys; # Discard parent_id.
+	shift @other_keys; # Discard name.
 
 	# Convert array other_keys into hash ref _sub_keys
 	# so sub _save can easily look up any keys it comes across.
@@ -223,7 +221,8 @@ C<DBIx::Hash2Table> - Save a hash into a database table
 		dbh        => $dbh,
 		table_name => $table_name,
 #		columns    => ['id', 'parent_id', 'name'] # or
-		columns    => ['id', 'parent_id', 'name', 'code']
+#		columns    => ['id', 'parent_id', 'name', 'code']
+		columns    => ['id', 'parent_id', 'name', '_url', 'code']
 	) -> insert();
 
 =head1 Description
@@ -232,7 +231,7 @@ C<DBIx::Hash2Table> is a pure Perl module.
 
 This module saves a hash into an existing database table of at least 3 columns.
 
-I suggest you display the script examples/hash2table.pl in another window while reading the following.
+I suggest you display the script examples/test-hash2table.pl in another window while reading the following.
 
 In fact, you are I<strongly> recommended to run the demo now, and examine the resultant database table, before reading
 further. Then, move the comment # up from line 72 to 71 and run it again.
@@ -282,6 +281,16 @@ A name column
 This column is for the hash key itself.
 
 =back
+
+=head1 Distributions
+
+This module is available both as a Unix-style distro (*.tgz) and an
+ActiveState-style distro (*.ppd). The latter is shipped in a *.zip file.
+
+See http://savage.net.au/Perl-modules.html for details.
+
+See http://savage.net.au/Perl-modules/html/installing-a-module.html for
+help on unpacking and installing each type of distro.
 
 =head1 Constructor and initialization
 
@@ -385,7 +394,7 @@ value pointed to by this hash key is written to the same row has the 'current' h
 
 =back
 
-The program examples/hash2table.pl shows exactly what this means.
+The program examples/test-hash2table.pl shows exactly what this means.
 
 Warning: The names of these columns 3 .. N must be sorted alphabetically. That's the only way the module can know how
 to bind the values associated with these columns into their correct places in the SQL insert statement.

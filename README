@@ -25,7 +25,8 @@ Synopsis
                     dbh        => $dbh,
                     table_name => $table_name,
     #               columns    => ['id', 'parent_id', 'name'] # or
-                    columns    => ['id', 'parent_id', 'name', 'code']
+    #               columns    => ['id', 'parent_id', 'name', 'code']
+                    columns    => ['id', 'parent_id', 'name', '_url', 'code']
             ) -> insert();
 
 Description
@@ -34,7 +35,7 @@ Description
     This module saves a hash into an existing database table of at least 3
     columns.
 
-    I suggest you display the script examples/hash2table.pl in another
+    I suggest you display the script examples/test-hash2table.pl in another
     window while reading the following.
 
     In fact, you are *strongly* recommended to run the demo now, and examine
@@ -84,6 +85,15 @@ Description
     *   A name column
 
         This column is for the hash key itself.
+
+Distributions
+    This module is available both as a Unix-style distro (*.tgz) and an
+    ActiveState-style distro (*.ppd). The latter is shipped in a *.zip file.
+
+    See http://savage.net.au/Perl-modules.html for details.
+
+    See http://savage.net.au/Perl-modules/html/installing-a-module.html for
+    help on unpacking and installing each type of distro.
 
 Constructor and initialization
     new(...) returns a "DBIx::Hash2Table" object.
@@ -159,7 +169,7 @@ Constructor and initialization
                 pointed to by this hash key is written to the same row has
                 the 'current' hash key.
 
-            The program examples/hash2table.pl shows exactly what this
+            The program examples/test-hash2table.pl shows exactly what this
             means.
 
             Warning: The names of these columns 3 .. N must be sorted

@@ -6,7 +6,7 @@ Hash2Table.html
 README
 test.pl
 Makefile.PL
-examples/hash2table.pl
+examples/test-hash2table.pl
 t/test.t
 blib/html/site/lib/DBIx/Hash2Table.html
 blib/man3/.exists

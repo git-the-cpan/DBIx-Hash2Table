@@ -15,6 +15,7 @@
 	<li><a href="#name">NAME</a></li>
 	<li><a href="#synopsis">Synopsis</a></li>
 	<li><a href="#description">Description</a></li>
+	<li><a href="#distributions">Distributions</a></li>
 	<li><a href="#constructor_and_initialization">Constructor and initialization</a></li>
 	<li><a href="#method:_new(...)">Method: <code>new(...)</code></a></li>
 	<li><a href="#method:_insert()">Method: <code>insert()</code></a></li>
@@ -59,7 +60,8 @@
                 dbh        =&gt; $dbh,
                 table_name =&gt; $table_name,
 #               columns    =&gt; ['id', 'parent_id', 'name'] # or
-                columns    =&gt; ['id', 'parent_id', 'name', 'code']
+#               columns    =&gt; ['id', 'parent_id', 'name', 'code']
+                columns    =&gt; ['id', 'parent_id', 'name', '_url', 'code']
         ) -&gt; insert();</pre>
 <p>
 </p>
@@ -67,7 +69,7 @@
 <h1><a name="description">Description</a></h1>
 <p><code>DBIx::Hash2Table</code> is a pure Perl module.</p>
 <p>This module saves a hash into an existing database table of at least 3 columns.</p>
-<p>I suggest you display the script examples/hash2table.pl in another window while reading the following.</p>
+<p>I suggest you display the script examples/test-hash2table.pl in another window while reading the following.</p>
 <p>In fact, you are <em>strongly</em> recommended to run the demo now, and examine the resultant database table, before reading
 further. Then, move the comment # up from line 72 to 71 and run it again.</p>
 <p>Hash keys normally point to hash refs. This nested structure is preserved when the data is written to the table.</p>
@@ -98,6 +100,15 @@ The parent's id column
 A name column
 <p>This column is for the hash key itself.</p>
 <p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="distributions">Distributions</a></h1>
+<p>This module is available both as a Unix-style distro (*.tgz) and an
+ActiveState-style distro (*.ppd). The latter is shipped in a *.zip file.</p>
+<p>See <a href="http://savage.net.au/Perl-modules.html">http://savage.net.au/Perl-modules.html</a> for details.</p>
+<p>See <a href="http://savage.net.au/Perl-modules/html/installing-a-module.html">http://savage.net.au/Perl-modules/html/installing-a-module.html</a> for
+help on unpacking and installing each type of distro.</p>
 <p>
 </p>
 <hr />
@@ -163,7 +174,7 @@ Save me!
 <p>In other words, even though this hash key (which is a column name!) is a child of the 'current' hash key, the
 value pointed to by this hash key is written to the same row has the 'current' hash key.</p>
 <p></p></ul>
-<p>The program examples/hash2table.pl shows exactly what this means.</p>
+<p>The program examples/test-hash2table.pl shows exactly what this means.</p>
 <p>Warning: The names of these columns 3 .. N must be sorted alphabetically. That's the only way the module can know how
 to bind the values associated with these columns into their correct places in the SQL insert statement.</p>
 </ul>
