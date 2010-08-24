@@ -1,5 +1,16 @@
 Revision history for Perl extension DBIx::Hash2Table.
 
+2.04  Sun Feb 21 12:55:02 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+2.03  Wed Feb 10 14:01:51 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+2.02  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
 2.01  Thu Oct 27 19:40:00 2005
 	- Simplify code in new() to no longer check if caller is an object
 		as per the new standard on such matters

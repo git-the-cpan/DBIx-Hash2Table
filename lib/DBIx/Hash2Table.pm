@@ -55,7 +55,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 
 );
-our $VERSION = '2.01';
+our $VERSION = '2.04';
 
 # -----------------------------------------------
 
@@ -411,14 +411,6 @@ Returns nothing.
 Calling insert() actually executes the SQL insert statement, and recursively writes
 all hash keys to the table.
 
-=head1 Required Modules
-
-DBI, since you must provide a database handle.
-
-=head1 Changes
-
-See Changes.txt.
-
 =head1 FAQ
 
 Q: What is the point of this module?
@@ -437,8 +429,7 @@ Home page: http://savage.net.au/index.html
 
 =head1 Copyright
 
-Australian copyright (c) 2003, Ron Savage. All rights reserved.
-
+Australian copyright (c) 2003, Ron Savage.
 	All Programs of mine are 'OSI Certified Open Source Software';
 	you can redistribute them and/or modify them under the terms of
 	The Artistic License, a copy of which is available at:
